@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace Utilities.Character
+namespace Utilities.StepGame.Character
 {
     public abstract class CharacterAction
     {
         public bool IsComplete { get; protected set; } = false;
 
-        public abstract Task Run(PlayerController character);
+        public abstract Task Run(StepGamePlayerController character);
     }
 }

@@ -6,9 +6,9 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using IAC = Utilities.StepGame.StepGameInputActionsCollection;
 
-namespace Utilities.Character
+namespace Utilities.StepGame.Character
 {
-    public class PlayerController : MonoBehaviour
+    public class StepGamePlayerController : MonoBehaviour
     {
         private void OnEnable()
         {
