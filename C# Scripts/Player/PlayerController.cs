@@ -108,16 +108,16 @@ namespace Utilities.Character
             mousePosition.z = 0;
             Vector3 mouseDirection = (mousePosition - playerPosition).normalized;
             float distance = Mathf.Min(1.5f, (mousePosition - playerPosition).magnitude);
-            StartStep(mouseDirection, distance);
+            //StartStep(mouseDirection, distance);
         }
 
-        void StartStep(Vector3 direction, float distance)
-        {
-            if (!HasActionOfType<StepAction>())
-            {
-                StepAction stepAction = new StepAction(direction, distance, 5);
-                EnqueueAction(stepAction);
-            }
-        }
+        //void StartStep(Vector3 direction, float distance)
+        //{
+        //    if (!HasActionOfType<StepAction>())
+        //    {
+        //        StepAction stepAction = new StepAction(direction, distance, 5);
+        //        EnqueueAction(stepAction);
+        //    }
+        //}
     }
 }
