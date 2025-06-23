@@ -7,118 +7,121 @@ using UnityEditor.VersionControl;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-public class SingletonBase<T> : MonoBehaviour where T : SingletonBase<T>
+namespace Utilities.Singleton
 {
-
-    // Refers to the instance
-    public static T Singleton { get { return _singleton; } }
-    private static T _singleton;
-
-    private void EstablishThisAsSingleton()
+    public class SingletonBase<T> : MonoBehaviour where T : SingletonBase<T>
     {
-        //If there is already an instance
-        if(_singleton != null)
+
+        // Refers to the instance
+        public static T Singleton { get { return _singleton; } }
+        private static T _singleton;
+
+        private void EstablishThisAsSingleton()
         {
-            //And its not this instance
-            if(_singleton != (T)this)
+            //If there is already an instance
+            if (_singleton != null)
             {
-                //Destroy the existing
-                DestroyImmediate(_singleton);
-                //And replace it
+                //And its not this instance
+                if (_singleton != (T)this)
+                {
+                    //Destroy the existing
+                    DestroyImmediate(_singleton);
+                    //And replace it
+                    _singleton = (T)this;
+
+                    Debug.LogWarning($"Replaced existing Singleton of type {typeof(T).ToString()}");
+                }
+            }
+            //If it's empty
+            else
+            {
+                //This is the new instance
                 _singleton = (T)this;
-
-                Debug.LogWarning($"Replaced existing Singleton of type {typeof(T).ToString()}");
             }
         }
-        //If it's empty
-        else 
-        { 
-            //This is the new instance
-            _singleton = (T) this;
-        }
-    }
 
-    // Can be used attatched to an object in the scene, aslong as there's only one.
-    private void Awake()
-    {
-        EstablishThisAsSingleton();
-
-        OnSingletonAwake();
-    }
-
-    protected virtual void OnSingletonAwake() { }
-
-    protected virtual void OnDestroy()
-    {
-        //If we're the singleton, remove us
-        if(_singleton == (T)this)
+        // Can be used attatched to an object in the scene, aslong as there's only one.
+        private void Awake()
         {
-            _singleton = null;
+            EstablishThisAsSingleton();
+
+            OnSingletonAwake();
         }
-    }
 
-    private static bool warningLogged = false;
+        protected virtual void OnSingletonAwake() { }
 
-    public static bool TryGetSingleton(out T singleton)
-    {
-        if (_singleton == null)
+        protected virtual void OnDestroy()
         {
-            singleton = null;
-
-            // Only log the caller information in debug builds (or when needed)
-#if UNITY_EDITOR
-            if (!warningLogged)
+            //If we're the singleton, remove us
+            if (_singleton == (T)this)
             {
-                LogSingletonCallerInformation(true);
-                warningLogged = true;
+                _singleton = null;
             }
-#endif
-            return false;
         }
-        else
+
+        private static bool warningLogged = false;
+
+        public static bool TryGetSingleton(out T singleton)
         {
-            singleton = _singleton;
-            return true;
+            if (_singleton == null)
+            {
+                singleton = null;
+
+                // Only log the caller information in debug builds (or when needed)
+#if UNITY_EDITOR
+                if (!warningLogged)
+                {
+                    LogSingletonCallerInformation(true);
+                    warningLogged = true;
+                }
+#endif
+                return false;
+            }
+            else
+            {
+                singleton = _singleton;
+                return true;
+            }
         }
-    }
 
 #if UNITY_EDITOR
-    // Helper function to log the caller class automatically
-    private static void LogSingletonCallerInformation(bool isWarning = false)
-    {
-        var stackTrace = new StackTrace(true);
-        var frame = stackTrace.GetFrame(2); // Get the frame two levels up (caller)
-        var method = frame.GetMethod();
-        var callerType = method.DeclaringType;
-        var file = frame.GetFileName();
-        string filePath = "Assets\\" + Path.GetRelativePath(Application.dataPath, file);
-        filePath = filePath.Replace("\\", "/");
-        var lineNumber = frame.GetFileLineNumber();
-        string fullPath = filePath + $":{lineNumber}";
+        // Helper function to log the caller class automatically
+        private static void LogSingletonCallerInformation(bool isWarning = false)
+        {
+            var stackTrace = new StackTrace(true);
+            var frame = stackTrace.GetFrame(2); // Get the frame two levels up (caller)
+            var method = frame.GetMethod();
+            var callerType = method.DeclaringType;
+            var file = frame.GetFileName();
+            string filePath = "Assets\\" + Path.GetRelativePath(Application.dataPath, file);
+            filePath = filePath.Replace("\\", "/");
+            var lineNumber = frame.GetFileLineNumber();
+            string fullPath = filePath + $":{lineNumber}";
 
 
-        string information = string.Empty;
+            string information = string.Empty;
 
-        if(callerType != null && !string.IsNullOrEmpty(file) && lineNumber > 0)
-        {
-            // Only log file/line number if available
-            information = $"Singleton of type {typeof(T).Name} accessed by {callerType.FullName} (at <a href=\"{filePath}\" line=\"{lineNumber}\">{fullPath}</a>)";
-        }
-        else
-        {
-            // Log fallback message if file/line is not available
-            information = $"Singleton of type {typeof(T).Name} accessed by {callerType?.FullName ?? "Unknown"} (file/line unavailable)";
-        }
+            if (callerType != null && !string.IsNullOrEmpty(file) && lineNumber > 0)
+            {
+                // Only log file/line number if available
+                information = $"Singleton of type {typeof(T).Name} accessed by {callerType.FullName} (at <a href=\"{filePath}\" line=\"{lineNumber}\">{fullPath}</a>)";
+            }
+            else
+            {
+                // Log fallback message if file/line is not available
+                information = $"Singleton of type {typeof(T).Name} accessed by {callerType?.FullName ?? "Unknown"} (file/line unavailable)";
+            }
 
-        if (isWarning)
-        {
-            Debug.LogWarning(information);
+            if (isWarning)
+            {
+                Debug.LogWarning(information);
+            }
+            else
+            {
+                Debug.Log(information);
+            }
         }
-        else
-        {
-            Debug.Log(information);
-        }
-    }
 #endif
 
+    }
 }

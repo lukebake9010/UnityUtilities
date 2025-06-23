@@ -4,58 +4,60 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
-public class SimpleSceneLoader : MonoBehaviour
+namespace Utilities.SceneManagement
 {
-    [SerializeField]
-    private bool AutoLoadScene = false; //Does Scene automatically load when async done
-
-
-    //Display Progress is used for Loading Bars & Public displays of Loading Async Progress
-    private float displayProgress = 0;
-    public float DisplayProgress { get; private set; }
-
-
-    //Function to Start Async Loading Coroutine
-    public void StartLoadScene(string sceneName)
+    public class SimpleSceneLoader : MonoBehaviour
     {
-        StartCoroutine(Loadlevel(sceneName)); //Start Coroutine
-    }
+        [SerializeField]
+        private bool AutoLoadScene = false; //Does Scene automatically load when async done
 
-    IEnumerator Loadlevel(string sceneName)
-    {
-        //Create Empty AsyncOperation
-        AsyncOperation loadAsync = null;
+        //Display Progress is used for Loading Bars & Public displays of Loading Async Progress
+        private float displayProgress = 0;
+        public float DisplayProgress { get; private set; }
 
-        //Attempt to create an Async Operation to Load Scene
-        try
+
+        //Function to Start Async Loading Coroutine
+        public void StartLoadScene(string sceneName)
         {
-            loadAsync = SceneManager.LoadSceneAsync(sceneName);
-        }
-        //If can't create Async, throw error message and break;
-        catch (System.Exception e)
-        {
-            Debug.LogException(e);
-            yield break;
+            StartCoroutine(Loadlevel(sceneName)); //Start Coroutine
         }
 
-        //If loadAsync wasn't created, break
-        if (loadAsync == null) yield break;
-
-
-        //While scene isn't loaded
-        while (!loadAsync.isDone && displayProgress < 0.9f)
+        IEnumerator Loadlevel(string sceneName)
         {
-            //Update DisplayProgress
-            displayProgress = loadAsync.progress;
+            //Create Empty AsyncOperation
+            AsyncOperation loadAsync = null;
 
-            //Output Progress in console
-            Debug.Log("Loading Scene: " + sceneName + " , Progress: " + displayProgress);
+            //Attempt to create an Async Operation to Load Scene
+            try
+            {
+                loadAsync = SceneManager.LoadSceneAsync(sceneName);
+            }
+            //If can't create Async, throw error message and break;
+            catch (System.Exception e)
+            {
+                Debug.LogException(e);
+                yield break;
+            }
 
-            //Yield Process
+            //If loadAsync wasn't created, break
+            if (loadAsync == null) yield break;
+
+
+            //While scene isn't loaded
+            while (!loadAsync.isDone && displayProgress < 0.9f)
+            {
+                //Update DisplayProgress
+                displayProgress = loadAsync.progress;
+
+                //Output Progress in console
+                Debug.Log("Loading Scene: " + sceneName + " , Progress: " + displayProgress);
+
+                //Yield Process
+                yield return null;
+            }
+
+            //End Coroutine
             yield return null;
         }
-
-        //End Coroutine
-        yield return null;
     }
 }
