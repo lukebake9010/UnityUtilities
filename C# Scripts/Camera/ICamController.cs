@@ -8,7 +8,7 @@ namespace Utilities.CameraScripts
     {
         public abstract Vector3 CameraPosition();
 
-        protected void Register()
+        public void Register()
         {
             if (CameraManager.TryGetSingleton(out CameraManager camManager))
             {
@@ -16,7 +16,7 @@ namespace Utilities.CameraScripts
             }
         }
 
-        protected void Unregister()
+        public void Unregister()
         {
             if (CameraManager.TryGetSingleton(out CameraManager camManager))
             {

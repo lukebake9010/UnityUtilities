@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Utilities.Singleton;
 
@@ -9,7 +10,17 @@ namespace Utilities.CameraScripts
     {
         public Camera mainCamera;
 
-        private List<ICamController> camControllers;
+        [Header("Lock Position")]
+        public bool lockXPosition = false;
+        public bool lockYPosition = false;
+        public bool lockZPosition = false;
+
+        [Header("Lock Rotation")]
+        public bool lockXRotation = false;
+        public bool lockYRotation = false;
+        public bool lockZRotation = false;
+
+        private List<ICamController> camControllers = new List<ICamController>();
 
         public void RegisterCamController(ICamController camController)
         {
@@ -24,19 +35,38 @@ namespace Utilities.CameraScripts
 
         #region Monobehavior calls
 
-        private void Awake()
-        {
+        protected override void OnSingletonAwake() { }
 
-        }
-
-        private void Start()
-        {
-
-        }
+        private void Start() { }
 
         private void Update()
         {
+            if(mainCamera != null)
+            {
+                if(camControllers.Count > 0)
+                {
+                    if(camControllers.Last() != null)
+                    {
+                        ICamController camController = camControllers.Last();
+                        Vector3 camControllerPosition = camController.CameraPosition();
 
+
+                        Transform mainCameraTransform = mainCamera.transform;
+
+                        float newXPosition = (lockXPosition) ? mainCameraTransform.position.x : camControllerPosition.x;
+                        float newYPosition = (lockYPosition) ? mainCameraTransform.position.y : camControllerPosition.y;
+                        float newZPosition = (lockZPosition) ? mainCameraTransform.position.z : camControllerPosition.z;
+
+                        Vector3 newCameraPosition = new Vector3(newXPosition, newYPosition, newZPosition);
+
+                        mainCameraTransform.position = newCameraPosition;
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogError("No Camera Supplied to CameraManager!");
+            }
         }
 
         #endregion
