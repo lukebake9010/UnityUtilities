@@ -31,9 +31,12 @@ namespace Utilities.SceneManagement
         /// <param name="sceneIndex">
         /// Index of the scene to load
         /// </param>
-        public void StartLoadScene(int sceneIndex)
+        /// <returns>
+        /// The started <see cref="LoadScene(int)"/> coroutine
+        /// </returns>
+        public Coroutine StartLoadScene(int sceneIndex)
         {
-            StartCoroutine(LoadScene(sceneIndex)); //Start Coroutine
+            return StartCoroutine(LoadScene(sceneIndex)); //Start Coroutine
         }
 
         /// <summary>
